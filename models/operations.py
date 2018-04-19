@@ -467,10 +467,10 @@ def knn_gather(som_node, som_node_knn_I, som_node_neighbors):
     :return:
     '''
 
-    b = cuda.blockIdx.x
-    c = cuda.blockIdx.y
-    n = cuda.threadIdx.x  # n \in [0, N-1]
-    k = cuda.threadIdx.y  # k
+    n = cuda.blockIdx.x
+    k = cuda.blockIdx.y
+    b = cuda.threadIdx.x  # n \in [0, N-1]
+    c = cuda.threadIdx.y  # k
 
     som_node_neighbors[b, c, n, k] = som_node[b, c, som_node_knn_I[b, n, k]]
 
@@ -495,7 +495,7 @@ def knn_gather_wrapper(som_node, som_node_knn_I):
     som_node_knn_I_cuda = get_devicendarray_int32(som_node_knn_I.type(torch.cuda.IntTensor))
     som_node_neighbors_cuda = get_devicendarray_float32(som_node_neighbors)
 
-    knn_gather[(B, C), (N, K)](som_node_cuda, som_node_knn_I_cuda, som_node_neighbors_cuda)
+    knn_gather[(N, K), (B, C)](som_node_cuda, som_node_knn_I_cuda, som_node_neighbors_cuda)
 
     return som_node_neighbors
 
